@@ -1,8 +1,7 @@
 # Product Requirements Document (PRD)
 
 # Tiny URL Service
-**Version:** 0.1  
-**Sprint:** Sprint 0 (Project Initialization)
+**Sprint:** Sprint 1 (Core URL Shortening)
 
 ---
 
@@ -83,11 +82,12 @@ Each generated short URL shall have a unique identifier.
 
 ### Performance
 
-- URL redirection should be fast.
+- URL redirection should have minimal latency.
 
 ### Reliability
 
-- Generated URLs should continue to work after application restarts.
+- URL mappings shall be persisted in PostgreSQL.
+- Generated URLs shall remain functional after application restarts.
 
 ### Scalability
 
@@ -96,6 +96,11 @@ Each generated short URL shall have a unique identifier.
 ### Maintainability
 
 - The codebase should be modular, testable, and easy to extend.
+
+### Security
+
+- Only valid HTTP and HTTPS URLs shall be accepted.
+- User input shall be validated before persistence.
 
 ---
 
@@ -131,25 +136,137 @@ Each generated short URL shall have a unique identifier.
 
 ---
 
-## Deliverables (Sprint 0)
+### AC-4
 
-- Initialize Git repository
-- Create project documentation
-- Generate Rails API application
-- Configure PostgreSQL
-- Configure RSpec
-- Configure RuboCop
-- Verify the application boots successfully
-- Ensure at least one passing test
+**Given** a valid URL
+
+**When** it is shortened
+
+**Then** the mapping between the short code and original URL is persisted in the database.
+
+---
+
+## Risks
+
+- Short code collisions must be handled.
+- Invalid URLs must not be persisted.
+- Redirect performance should remain acceptable as the dataset grows.
+
+---
+
+## Data Model
+
+### ShortUrl
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | bigint | Primary key | Record Identifier
+| original_url | string | Not Null | Original destination URL |
+| short_code | string | Unique, Not Null | Unique generated identifier |
+| created_at | datetime | Not Null | Record creation timestamp |
+| updated_at | datetime | Not Null | Record update timestamp |
+
+---
+
+## Deliverables (Sprint 1)
+
+- Create the `ShortUrl` model
+- Design the database schema
+- Create database migrations
+- Implement URL shortening endpoint
+- Implement URL redirection endpoint
+- Validate input URLs
+- Generate unique short codes
+- Add request specs
+- Maintain passing CI pipeline
+
+---
+
+## API Endpoints
+
+### POST /short_urls
+
+Creates a new shortened URL.
+
+#### Request
+
+```json
+{
+  "url": "https://example.com/very/long/url"
+}
+```
+
+#### Response
+
+**201 Created**
+
+```json
+{
+  "short_url": "http://localhost:3000/abc123"
+}
+```
+
+#### Error Response
+
+**422 Unprocessable Entity**
+
+```json
+{
+  "errors": [
+    "URL is invalid"
+  ]
+}
+```
+
+### GET /:short_code
+
+Redirects to the original URL associated with the short code.
+
+#### Response
+
+- **302 Found** → Redirects to the original URL.
+- **404 Not Found** → If the short code does not exist.
+
+---
+
+## Assumptions
+
+- Short codes are generated automatically.
+- Short codes are immutable.
+- Duplicate long URLs may generate different short URLs.
+- URLs are publicly accessible.
+
+---
+
+## Constraints
+
+- Rails API only.
+- PostgreSQL as the persistence layer.
+- RSpec for testing.
+- RuboCop for linting.
 
 ---
 
 ## Success Criteria
 
-Sprint 0 is considered complete when:
+Sprint 1 is considered complete when:
 
-- The development environment is fully operational.
-- Documentation has been created.
-- The project is under version control.
-- Automated tests can be executed successfully.
-- The team is ready to begin implementing Sprint 1 features.
+- A valid URL can be shortened.
+- Visiting the short URL redirects correctly.
+- Invalid URLs are rejected.
+- Automated tests pass.
+- CI pipeline remains green.
+
+---
+
+## Future Work
+
+The following enhancements are planned beyond Sprint 1:
+
+- User authentication
+- Analytics
+- Custom aliases
+- URL expiration
+- QR code generation
+- Rate limiting
+- API versioning
