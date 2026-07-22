@@ -11,13 +11,14 @@ RSpec.describe ShortUrl, type: :model do
       expect(short_url.errors[:original_url]).to include("can't be blank")
     end
 
-    it "is invalid without a short code" do
+    it "automatically generates a short code before validation" do
       short_url = ShortUrl.new(
         original_url: "https://www.example.com"
       )
 
-      expect(short_url).not_to be_valid
-      expect(short_url.errors[:short_code]).to include("can't be blank")
+      expect(short_url.short_code).to be_nil
+      expect(short_url).to be_valid
+      expect(short_url.short_code).to eq("abc123")
     end
 
     it "is invalid with duplicate short codes" do
