@@ -229,11 +229,95 @@ feature/<feature-name>
 
 ---
 
+# ADR-007: Use 6-Character Base62 Short Codes
+
+**Status:** Accepted
+
+## Context
+
+The Tiny URL Service needs a short identifier for each shortened URL.
+
+The identifier should be compact enough to keep shortened URLs short while providing a sufficiently large namespace for the expected number of URLs.
+
+We considered different code lengths and character sets, as well as sequential identifiers.
+
+## Decision
+
+Use **6-character Base62 short codes** for shortened URLs.
+
+Base62 consists of:
+
+* `a-z`
+* `A-Z`
+* `0-9`
+
+Six Base62 characters provide:
+
+**62⁶ = 56,800,235,584 possible combinations.**
+
+Each generated short code must:
+
+* Contain exactly 6 characters.
+* Use only Base62 characters.
+* Be unique.
+* Be generated automatically when a `ShortUrl` is created.
+
+Uniqueness will be enforced both at the application level and at the database level.
+
+## Rationale
+
+Six characters provide a practical balance between URL length and the size of the available namespace.
+
+Random Base62 codes also make identifiers less predictable than sequential identifiers, making simple enumeration more difficult.
+
+However, randomness is not considered an authorization or privacy mechanism.
+
+## Alternatives Considered
+
+### Shorter Codes
+
+Shorter codes produce smaller URLs but reduce the available namespace and increase the likelihood of collisions as the number of URLs grows.
+
+### Longer Codes
+
+Longer codes provide a larger namespace but make shortened URLs unnecessarily long for the expected scope of the project.
+
+### Sequential IDs
+
+Sequential IDs are simple and can avoid random-generation collisions, but they are predictable and make enumeration of other shortened URLs easier.
+
+### Random Base62 Codes
+
+Random Base62 codes provide a large namespace, compact URLs, and less predictable identifiers.
+
+## Consequences
+
+### Positive
+
+* Compact shortened URLs.
+* Large namespace of possible codes.
+* URL-safe character set.
+* Less predictable than sequential identifiers.
+* Provides a straightforward foundation for the URL-shortening service.
+
+### Negative
+
+* Random generation can produce collisions.
+* Collision handling is required.
+* The database must enforce uniqueness.
+* The decision may need to be revisited if the system's scale or requirements change significantly.
+
+## Revisit
+
+Revisit this decision if the expected number of URLs, security requirements, traffic patterns, or identifier-generation strategy changes significantly.
+
+---
+
 ## Future ADRs
 
 Future architectural decisions may include:
 
-* Short code generation strategy.
+* Short code generation and collision handling implementation.
 * Collision handling algorithm.
 * URL validation strategy.
 * Database indexing.

@@ -96,3 +96,94 @@ We selected PostgreSQL because it:
 ## Revisit
 
 This decision should be revisited only if future project requirements significantly change.
+
+---
+
+# ADR-002: Use 6-Character Base62 Short Codes
+
+**Date:** 13 August 2026
+
+**Status:** Accepted
+
+## Context
+
+The Tiny URL service needs a short identifier for each shortened URL.
+
+The identifier should be:
+
+* Short enough to keep generated URLs compact.
+* Large enough to support a substantial number of URL mappings.
+* Simple to generate and use as a URL-safe identifier.
+
+We considered different code lengths and character sets.
+
+A Base62 character set consists of:
+
+* `a-z`
+* `A-Z`
+* `0-9`
+
+With 6 Base62 characters, the system has:
+
+**62⁶ = 56,800,235,584 possible combinations.**
+
+This provides a large namespace while keeping the generated short code compact.
+
+## Decision
+
+We will generate **6-character Base62 short codes** for shortened URLs.
+
+The `short_code` must:
+
+* Contain exactly 6 characters.
+* Use only Base62 characters.
+* Be unique.
+* Be generated automatically when a `ShortUrl` is created.
+
+The database will enforce uniqueness on `short_code` in addition to the Active Record uniqueness validation.
+
+## Alternatives Considered
+
+### Fewer Characters
+
+Shorter codes reduce URL length but provide a smaller namespace and increase the probability of collisions as the number of stored URLs grows.
+
+### More Characters
+
+Longer codes provide a larger namespace but make the resulting URLs less compact than necessary for the expected scope of this project.
+
+### Sequential Numeric IDs
+
+Using encoded database IDs could avoid random-generation collisions, but sequential identifiers can make URL enumeration easier and introduce different design considerations around predictability.
+
+### Random Base62 Codes
+
+Random Base62 codes provide a large namespace while keeping URLs compact and making identifiers less predictable than sequential IDs.
+
+## Why 6 Characters?
+
+Six characters provide a practical balance between URL length and namespace size for the scope of this project.
+
+The 6-character Base62 namespace contains approximately **56.8 billion** possible codes, which is substantially larger than the expected number of URLs for this project.
+
+Random generation can still produce collisions, so collision handling and database-level uniqueness enforcement are required.
+
+## Consequences
+
+### Positive
+
+* Short and readable URLs.
+* Large namespace of possible codes.
+* URL-safe character set.
+* Less predictable than sequential identifiers.
+* Provides an opportunity to explore collision handling and database constraints.
+
+### Negative
+
+* Random generation can produce collisions.
+* Collision handling is required.
+* The chosen length may need to be revisited if the expected scale changes significantly.
+
+## Revisit
+
+This decision should be revisited if the expected number of stored URLs, traffic patterns, security requirements, or identifier-generation strategy changes significantly.
