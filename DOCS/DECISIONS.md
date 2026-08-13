@@ -168,6 +168,23 @@ The 6-character Base62 namespace contains approximately **56.8 billion** possibl
 
 Random generation can still produce collisions, so collision handling and database-level uniqueness enforcement are required.
 
+## Generation Strategy
+
+Short codes will be generated using Ruby's `SecureRandom` module.
+
+`SecureRandom` is preferred over general-purpose pseudo-random generation because
+the generated short codes should be difficult to predict.
+
+The generated characters will be selected from the Base62 alphabet:
+
+* `a-z`
+* `A-Z`
+* `0-9`
+
+The application will generate six characters for each new `ShortUrl`.
+
+Randomness is not considered an authorization or privacy mechanism.
+
 ## Consequences
 
 ### Positive

@@ -264,6 +264,19 @@ Each generated short code must:
 
 Uniqueness will be enforced both at the application level and at the database level.
 
+## Generation Strategy
+
+Short codes will be generated using Ruby's `SecureRandom` module.
+
+`SecureRandom` is preferred over general-purpose pseudo-random generation because
+the short codes should be difficult to predict.
+
+The generated characters will be selected from the Base62 alphabet:
+
+`a-z`, `A-Z`, and `0-9`.
+
+The application will generate six characters for each new `ShortUrl`.
+
 ## Rationale
 
 Six characters provide a practical balance between URL length and the size of the available namespace.
@@ -271,6 +284,10 @@ Six characters provide a practical balance between URL length and the size of th
 Random Base62 codes also make identifiers less predictable than sequential identifiers, making simple enumeration more difficult.
 
 However, randomness is not considered an authorization or privacy mechanism.
+
+* Uses a cryptographically secure random source.
+* Makes generated short codes less predictable.
+* Uses Ruby's standard library rather than introducing an additional dependency.
 
 ## Alternatives Considered
 
