@@ -42,16 +42,17 @@ RSpec.describe ShortUrl, type: :model do
 
     it "is invalid with duplicate short codes" do
       short_url = ShortUrl.create!(
-        original_url: "https://www.example.com",
-        short_code: "abc123"
+        original_url: "https://www.example.com"
       )
 
       short_url_1 = ShortUrl.new(
-        original_url: "https://www.example1.com",
-        short_code: "abc123"
+        original_url: "https://www.example1.com"
       )
 
-      expect(short_url).to be_valid
+      allow(short_url_1).to receive(:generate_short_code) do
+        short_url_1.short_code = short_url.short_code
+      end
+
       expect(short_url_1).not_to be_valid
       expect(short_url_1.errors[:short_code]).to include("has already been taken")
     end
