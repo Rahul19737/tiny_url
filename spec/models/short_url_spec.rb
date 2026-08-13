@@ -11,14 +11,33 @@ RSpec.describe ShortUrl, type: :model do
       expect(short_url.errors[:original_url]).to include("can't be blank")
     end
 
-    it "automatically generates a short code before validation" do
+    it "automatically generates a 6-character short code" do
       short_url = ShortUrl.new(
         original_url: "https://www.example.com"
       )
 
       expect(short_url.short_code).to be_nil
       expect(short_url).to be_valid
-      expect(short_url.short_code).to eq("abc123")
+      expect(short_url.short_code.length).to eq(6)
+    end
+
+    it "generates a short code using only Base62 characters" do
+      short_url = ShortUrl.new(
+        original_url: "https://www.example.com"
+      )
+
+      expect(short_url).to be_valid
+      expect(short_url.short_code).to match(/\A[a-zA-Z0-9]{6}\z/)
+    end
+
+    it "generates different short codes for different URLs" do
+      short_url_1 = ShortUrl.new( original_url: "https://www.example.com" )
+      short_url_2 = ShortUrl.new( original_url: "https://www.example.org" )
+
+      short_url_1.valid?
+      short_url_2.valid?
+
+      expect(short_url_1.short_code).not_to eq(short_url_2.short_code)
     end
 
     it "is invalid with duplicate short codes" do
