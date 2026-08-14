@@ -328,14 +328,62 @@ Random Base62 codes provide a large namespace, compact URLs, and less predictabl
 
 Revisit this decision if the expected number of URLs, security requirements, traffic patterns, or identifier-generation strategy changes significantly.
 
+# ADR-008: Handle Short Code Collisions with Bounded Retries
+
+**Date:** 20 July 2026
+
+**Status:** Accepted
+
+## Context
+
+Short codes are generated randomly from a 6-character Base62 namespace.
+
+Although the namespace contains approximately 56.8 billion possible combinations, random generation can still produce a short code that already exists in the database.
+
+The database enforces uniqueness on `short_code`, so a collision results in an `ActiveRecord::RecordNotUnique` exception.
+
+## Decision
+
+When a short code collision occurs during creation, the application will generate a new short code and retry the creation.
+
+The system will allow a maximum of **3 total creation attempts**.
+
+If all 3 attempts result in a uniqueness collision, the operation will fail with `ActiveRecord::RecordNotUnique`.
+
+The database unique constraint remains the final authority for enforcing uniqueness.
+
+## Rationale
+
+- Random collisions are possible even with a large namespace.
+- Retrying allows the application to recover from occasional collisions automatically.
+- A bounded retry limit prevents infinite retry loops.
+- Database-level uniqueness provides the final guarantee against duplicate short codes.
+
+## Consequences
+
+### Positive
+
+- Automatically recovers from rare short code collisions.
+- Keeps collision handling transparent to callers.
+- Prevents unbounded retries.
+- Preserves database-level uniqueness enforcement.
+
+### Negative
+
+- A collision requires another database creation attempt.
+- Extremely rare repeated collisions will cause creation to fail.
+- Retry behavior adds some complexity to the creation workflow.
+
+## Revisit
+
+This decision should be revisited if the short code generation strategy, expected scale, or persistence architecture changes significantly.
+
 ---
 
 ## Future ADRs
 
 Future architectural decisions may include:
 
-* Short code generation and collision handling implementation.
-* Collision handling algorithm.
 * URL validation strategy.
 * Database indexing.
 * Caching strategy.

@@ -204,3 +204,31 @@ Randomness is not considered an authorization or privacy mechanism.
 ## Revisit
 
 This decision should be revisited if the expected number of stored URLs, traffic patterns, security requirements, or identifier-generation strategy changes significantly.
+
+---
+
+# ADR-003: Handle Short Code Collisions with Bounded Retries
+
+**Date:** 20 July 2026
+
+**Status:** Accepted
+
+## Decision
+
+Random short code generation can produce a code that already exists.
+
+When the database unique constraint raises `ActiveRecord::RecordNotUnique`, the application will generate a new short code and retry the creation.
+
+A maximum of **3 total creation attempts** will be allowed.
+
+If all 3 attempts collide, the creation will fail.
+
+## Why?
+
+Random generation makes collisions possible even with a large namespace.
+
+Retrying allows the application to recover from occasional collisions while the 3-attempt limit prevents infinite retry loops.
+
+The database unique constraint remains the final authority for uniqueness.
+
+---
