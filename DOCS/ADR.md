@@ -330,7 +330,7 @@ Revisit this decision if the expected number of URLs, security requirements, tra
 
 # ADR-008: Handle Short Code Collisions with Bounded Retries
 
-**Date:** 20 July 2026
+**Date:** 14 August 2026
 
 **Status:** Accepted
 

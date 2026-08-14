@@ -209,7 +209,7 @@ This decision should be revisited if the expected number of stored URLs, traffic
 
 # ADR-003: Handle Short Code Collisions with Bounded Retries
 
-**Date:** 20 July 2026
+**Date:** 14 August 2026
 
 **Status:** Accepted
 
