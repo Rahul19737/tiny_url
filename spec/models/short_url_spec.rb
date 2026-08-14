@@ -50,8 +50,8 @@ RSpec.describe ShortUrl, type: :model do
     end
 
     it "generates different short codes for different URLs" do
-      short_url_1 = ShortUrl.new( original_url: "https://www.example.com" )
-      short_url_2 = ShortUrl.new( original_url: "https://www.example.org" )
+      short_url_1 = ShortUrl.new(original_url: "https://www.example.com")
+      short_url_2 = ShortUrl.new(original_url: "https://www.example.org")
 
       short_url_1.valid?
       short_url_2.valid?
@@ -76,12 +76,12 @@ RSpec.describe ShortUrl, type: :model do
       )
 
       expect(ShortUrl).to receive(:create!)
-        .with({original_url: "https://www.example.org"})
+        .with({ original_url: "https://www.example.org" })
         .and_raise(ActiveRecord::RecordNotUnique)
         .ordered
 
       expect(ShortUrl).to receive(:create!)
-        .with({original_url: "https://www.example.org"})
+        .with({ original_url: "https://www.example.org" })
         .and_return(first_short_url)
         .ordered
 

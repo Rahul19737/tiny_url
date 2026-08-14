@@ -23,7 +23,7 @@ class ShortUrl < ApplicationRecord
   private
 
   def generate_short_code
-    self.short_code = 6.times.map do 
+    self.short_code = 6.times.map do
       BASE62_ALPHABET[SecureRandom.random_number(BASE62_ALPHABET.length)]
     end.join
   end
