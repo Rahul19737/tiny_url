@@ -8,6 +8,18 @@ class ShortUrl < ApplicationRecord
   validates :original_url, presence: true
   validates :short_code, presence: true, uniqueness: true
 
+  def self.create_with_retry(attribute)
+    3.times do
+      begin
+        return create!(attribute)
+      rescue ActiveRecord::RecordNotUnique
+        next
+      end
+    end
+
+    raise ActiveRecord::RecordNotUnique
+  end
+
   private
 
   def generate_short_code
