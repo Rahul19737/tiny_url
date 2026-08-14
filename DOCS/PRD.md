@@ -63,6 +63,7 @@ These features will be considered in future sprints.
 ### FR-1: Shorten URL
 
 The system shall accept a valid URL and generate a unique shortened URL.
+The system generates a unique 6-character Base62 short code for each shortened URL.
 
 ### FR-2: Redirect
 
