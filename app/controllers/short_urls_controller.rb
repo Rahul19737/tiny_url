@@ -9,6 +9,12 @@ class ShortUrlsController < ApplicationController
     }, status: :created
   end
 
+  def show
+    short_url = ShortUrl.find_by!(short_code: params[:short_code])
+
+    redirect_to short_url.original_url
+  end
+
   private
 
   def short_url_params
