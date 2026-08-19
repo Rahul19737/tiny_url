@@ -12,7 +12,7 @@ class ShortUrlsController < ApplicationController
   def show
     short_url = ShortUrl.find_by!(short_code: params[:short_code])
 
-    redirect_to short_url.original_url
+    redirect_to short_url.original_url, allow_other_host: true
   end
 
   private
